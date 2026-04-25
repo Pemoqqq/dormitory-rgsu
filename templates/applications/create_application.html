@@ -1,0 +1,1264 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Подача заявления на заселение — РГСУ{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ============================================
+       CREATE APPLICATION PAGE STYLES
+       ============================================ */
+    
+    .page-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        animation: fadeInDown 0.8s ease-out;
+    }
+
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--primary-600) 0%, var(--secondary-600) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
+        line-height: 1.2;
+    }
+
+    .page-subtitle {
+        font-size: 1.125rem;
+        color: var(--text-secondary);
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    .application-wizard {
+        max-width: 900px;
+        margin: 0 auto;
+        animation: fadeInUp 0.8s ease-out 0.2s both;
+    }
+
+    .wizard-progress {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 3rem;
+        position: relative;
+        padding: 0 2rem;
+    }
+
+    .wizard-progress::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-200) 0%, var(--secondary-200) 100%);
+        transform: translateY(-50%);
+        z-index: 0;
+    }
+
+    .wizard-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+        position: relative;
+        z-index: 1;
+        cursor: pointer;
+        transition: all var(--transition-base);
+    }
+
+    .wizard-step-number {
+        width: 48px;
+        height: 48px;
+        border-radius: var(--radius-full);
+        background: white;
+        border: 3px solid var(--primary-300);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.125rem;
+        color: var(--primary-600);
+        transition: all var(--transition-bounce);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    }
+
+    .wizard-step.active .wizard-step-number {
+        background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-700) 100%);
+        border-color: var(--primary-600);
+        color: white;
+        transform: scale(1.15);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        animation: pulse 2s infinite;
+    }
+
+    .wizard-step.completed .wizard-step-number {
+        background: linear-gradient(135deg, var(--secondary-500) 0%, var(--secondary-700) 100%);
+        border-color: var(--secondary-600);
+        color: white;
+    }
+
+    .wizard-step-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text-tertiary);
+        text-align: center;
+        transition: all var(--transition-fast);
+    }
+
+    .wizard-step.active .wizard-step-label {
+        color: var(--primary-700);
+        font-weight: 700;
+    }
+
+    .wizard-step.completed .wizard-step-label {
+        color: var(--secondary-700);
+    }
+
+    .form-section {
+        background: white;
+        border-radius: var(--radius-2xl);
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-xl);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        animation: scaleIn 0.6s ease-out;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid var(--border-light);
+    }
+
+    .section-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: var(--radius-xl);
+        background: linear-gradient(135deg, var(--primary-100) 0%, var(--secondary-100) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        color: var(--primary-600);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .section-description {
+        color: var(--text-secondary);
+        font-size: 0.9375rem;
+        margin-top: 0.25rem;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .form-field.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .field-label {
+        font-weight: 600;
+        font-size: 0.9375rem;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+    }
+
+    .required-mark {
+        color: var(--error);
+        font-weight: 700;
+    }
+
+    .field-hint {
+        font-size: 0.8125rem;
+        color: var(--text-tertiary);
+        font-weight: 400;
+        margin-left: auto;
+    }
+
+    .input-group-custom {
+        position: relative;
+        display: flex;
+        align-items: stretch;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 1.25rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-tertiary);
+        font-size: 1.125rem;
+        pointer-events: none;
+        transition: all var(--transition-fast);
+        z-index: 1;
+    }
+
+    .form-control-custom {
+        width: 100%;
+        padding: 1rem 1.25rem;
+        padding-left: 3rem;
+        font-size: 1rem;
+        font-family: var(--font-sans);
+        border: 2px solid var(--border-light);
+        border-radius: var(--radius-lg);
+        background: white;
+        transition: all var(--transition-fast);
+        outline: none;
+    }
+
+    .form-control-custom:focus {
+        border-color: var(--primary-500);
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1), 0 4px 12px rgba(102, 126, 234, 0.15);
+    }
+
+    .form-control-custom:focus + .input-icon,
+    .form-control-custom:not(:placeholder-shown) + .input-icon {
+        color: var(--primary-600);
+    }
+
+    .form-select-custom {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 1rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        padding-right: 3rem;
+        cursor: pointer;
+    }
+
+    .form-select-custom:focus {
+        border-color: var(--primary-500);
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    .checkbox-group {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .checkbox-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.25rem;
+        border: 2px solid var(--border-light);
+        border-radius: var(--radius-lg);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        background: white;
+    }
+
+    .checkbox-item:hover {
+        border-color: var(--primary-300);
+        background: linear-gradient(135deg, var(--primary-50) 0%, var(--secondary-50) 100%);
+        transform: translateX(4px);
+    }
+
+    .checkbox-item input[type="checkbox"] {
+        width: 1.5rem;
+        height: 1.5rem;
+        margin-top: 0.125rem;
+        cursor: pointer;
+        accent-color: var(--primary-600);
+        flex-shrink: 0;
+    }
+
+    .checkbox-content {
+        flex: 1;
+    }
+
+    .checkbox-label {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+        display: block;
+    }
+
+    .checkbox-description {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        line-height: 1.5;
+    }
+
+    .info-card {
+        background: linear-gradient(135deg, var(--info-light) 0%, #bfdbfe 100%);
+        border-left: 4px solid var(--info);
+        padding: 1.5rem;
+        border-radius: var(--radius-lg);
+        margin-bottom: 2rem;
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+        animation: slideInLeft 0.6s ease-out;
+    }
+
+    .info-icon {
+        font-size: 1.5rem;
+        color: var(--info);
+        flex-shrink: 0;
+    }
+
+    .info-content {
+        flex: 1;
+    }
+
+    .info-title {
+        font-weight: 700;
+        color: #1e40af;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-text {
+        color: #1e3a8a;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    .rating-preview {
+        background: linear-gradient(135deg, var(--primary-600) 0%, var(--secondary-600) 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: var(--radius-xl);
+        text-align: center;
+        margin-top: 2rem;
+        box-shadow: var(--shadow-xl);
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    .rating-value {
+        font-size: 4rem;
+        font-weight: 900;
+        line-height: 1;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .rating-label {
+        font-size: 1.125rem;
+        opacity: 0.95;
+        font-weight: 500;
+    }
+
+    .rating-breakdown {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1.5rem;
+        text-align: left;
+    }
+
+    .breakdown-item {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 1rem;
+        border-radius: var(--radius-lg);
+        backdrop-filter: blur(10px);
+    }
+
+    .breakdown-label {
+        font-size: 0.875rem;
+        opacity: 0.9;
+        margin-bottom: 0.25rem;
+    }
+
+    .breakdown-value {
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 1rem;
+        justify-content: space-between;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 2px solid var(--border-light);
+    }
+
+    .btn-save-draft {
+        background: white;
+        color: var(--text-secondary);
+        border: 2px solid var(--border-medium);
+    }
+
+    .btn-save-draft:hover {
+        background: var(--gray-50);
+        border-color: var(--border-dark);
+        color: var(--text-primary);
+    }
+
+    .btn-submit-primary {
+        background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-700) 100%);
+        color: white;
+        border: none;
+        padding: 1rem 3rem;
+        font-size: 1.125rem;
+        font-weight: 700;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-submit-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+    }
+
+    .btn-submit-primary:active {
+        transform: translateY(0);
+    }
+
+    .validation-message {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        background: var(--error-light);
+        color: #991b1b;
+        border-radius: var(--radius-md);
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-top: 0.5rem;
+        animation: slideInRight 0.4s ease-out;
+    }
+
+    .validation-message i {
+        font-size: 1.125rem;
+    }
+
+    .success-animation {
+        text-align: center;
+        padding: 3rem;
+    }
+
+    .success-icon {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 2rem;
+        background: linear-gradient(135deg, var(--success) 0%, var(--secondary-600) 100%);
+        border-radius: var(--radius-full);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: scaleIn 0.6s ease-out;
+        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+    }
+
+    .success-icon i {
+        font-size: 4rem;
+        color: white;
+        animation: checkmark 0.6s ease-out 0.3s both;
+    }
+
+    @media (max-width: 768px) {
+        .page-title {
+            font-size: 1.75rem;
+        }
+
+        .form-section {
+            padding: 1.5rem;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .wizard-progress {
+            padding: 0 1rem;
+        }
+
+        .wizard-step-label {
+            font-size: 0.75rem;
+        }
+
+        .wizard-step-number {
+            width: 40px;
+            height: 40px;
+            font-size: 1rem;
+        }
+
+        .button-group {
+            flex-direction: column-reverse;
+        }
+
+        .btn-submit-primary,
+        .btn-save-draft {
+            width: 100%;
+        }
+    }
+
+    /* Loading state */
+    .btn-loading {
+        position: relative;
+        color: transparent !important;
+        pointer-events: none;
+    }
+
+    .btn-loading::after {
+        content: '';
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        top: 50%;
+        left: 50%;
+        margin-left: -10px;
+        margin-top: -10px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    /* Floating labels */
+    .floating-label {
+        position: relative;
+    }
+
+    .floating-label input,
+    .floating-label select {
+        padding-top: 1.75rem;
+        padding-bottom: 0.625rem;
+    }
+
+    .floating-label label {
+        position: absolute;
+        top: 1rem;
+        left: 3rem;
+        font-size: 1rem;
+        color: var(--text-tertiary);
+        pointer-events: none;
+        transition: all var(--transition-fast);
+    }
+
+    .floating-label input:focus ~ label,
+    .floating-label input:not(:placeholder-shown) ~ label,
+    .floating-label select:focus ~ label,
+    .floating-label select:valid ~ label {
+        top: 0.5rem;
+        font-size: 0.75rem;
+        color: var(--primary-600);
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">
+        <i class="fas fa-file-alt me-3"></i>
+        Подача заявления на заселение
+    </h1>
+    <p class="page-subtitle">
+        Заполните форму ниже для подачи заявки на предоставление места в общежитии РГСУ. 
+        Все поля, отмеченные <span class="required-mark">*</span>, обязательны для заполнения.
+    </p>
+</div>
+
+<div class="application-wizard">
+    <!-- Progress Indicator -->
+    <div class="wizard-progress">
+        <div class="wizard-step active" data-step="1">
+            <div class="wizard-step-number">1</div>
+            <div class="wizard-step-label">Личные данные</div>
+        </div>
+        <div class="wizard-step" data-step="2">
+            <div class="wizard-step-number">2</div>
+            <div class="wizard-step-label">Академические данные</div>
+        </div>
+        <div class="wizard-step" data-step="3">
+            <div class="wizard-step-number">3</div>
+            <div class="wizard-step-label">Льготы</div>
+        </div>
+        <div class="wizard-step" data-step="4">
+            <div class="wizard-step-number">4</div>
+            <div class="wizard-step-label">Подтверждение</div>
+        </div>
+    </div>
+
+    <form method="post" id="applicationForm" novalidate>
+        {% csrf_token %}
+
+        <!-- Section 1: Personal Information -->
+        <div class="form-section" id="step1">
+            <div class="section-header">
+                <div class="section-icon">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div>
+                    <h2 class="section-title">Личная информация</h2>
+                    <p class="section-description">Укажите ваши персональные данные для идентификации</p>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="info-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="info-content">
+                    <h5 class="info-title">Важная информация</h5>
+                    <p class="info-text">
+                        Данные будут автоматически подгружены из вашей учётной записи. 
+                        Пожалуйста, проверьте их корректность перед отправкой.
+                    </p>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-field">
+                    <label class="field-label">
+                        Фамилия
+                        <span class="required-mark">*</span>
+                    </label>
+                    <div class="input-group-custom">
+                        <input type="text" 
+                               class="form-control-custom" 
+                               name="last_name" 
+                               value="{{ user.last_name }}"
+                               placeholder="Введите фамилию"
+                               required>
+                        <i class="fas fa-user input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label class="field-label">
+                        Имя
+                        <span class="required-mark">*</span>
+                    </label>
+                    <div class="input-group-custom">
+                        <input type="text" 
+                               class="form-control-custom" 
+                               name="first_name" 
+                               value="{{ user.first_name }}"
+                               placeholder="Введите имя"
+                               required>
+                        <i class="fas fa-user input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label class="field-label">
+                        Отчество
+                    </label>
+                    <div class="input-group-custom">
+                        <input type="text" 
+                               class="form-control-custom" 
+                               name="patronymic" 
+                               value="{{ user.patronymic }}"
+                               placeholder="Введите отчество">
+                        <i class="fas fa-user input-icon"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-field">
+                    <label class="field-label">
+                        Email
+                        <span class="required-mark">*</span>
+                        <span class="field-hint">Для уведомлений</span>
+                    </label>
+                    <div class="input-group-custom">
+                        <input type="email" 
+                               class="form-control-custom" 
+                               name="email" 
+                               value="{{ user.email }}"
+                               placeholder="example@rgsu.ru"
+                               required>
+                        <i class="fas fa-envelope input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label class="field-label">
+                        Телефон
+                        <span class="required-mark">*</span>
+                    </label>
+                    <div class="input-group-custom">
+                        <input type="tel" 
+                               class="form-control-custom" 
+                               name="phone" 
+                               value="{{ user.phone }}"
+                               placeholder="+7 (999) 999-99-99"
+                               required>
+                        <i class="fas fa-phone input-icon"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-field full-width">
+                    <label class="field-label">
+                        Факультет
+                        <span class="required-mark">*</span>
+                    </label>
+                    <div class="input-group-custom">
+                        <select class="form-control-custom form-select-custom" 
+                                name="faculty" 
+                                required>
+                            <option value="" disabled selected>Выберите факультет</option>
+                            <option value="social_work">Факультет социальной работы</option>
+                            <option value="psychology">Факультет психологии</option>
+                            <option value="pedagogy">Педагогический факультет</option>
+                            <option value="law">Юридический факультет</option>
+                            <option value="economics">Факультет экономики и управления</option>
+                            <option value="humanities">Гуманитарный факультет</option>
+                        </select>
+                        <i class="fas fa-graduation-cap input-icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Academic Information -->
+        <div class="form-section" id="step2" style="display: none;">
+            <div class="section-header">
+                <div class="section-icon" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); color: #d97706;">
+                    <i class="fas fa-award"></i>
+                </div>
+                <div>
+                    <h2 class="section-title">Академические достижения</h2>
+                    <p class="section-description">Эти данные влияют на ваш рейтинг в очереди</p>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-field">
+                    <label class="field-label">
+                        Сумма баллов ЕГЭ
+                        <span class="required-mark">*</span>
+                        <span class="field-hint">Макс. 300</span>
+                    </label>
+                    <div class="input-group-custom">
+                        <input type="number" 
+                               class="form-control-custom" 
+                               name="ege_score" 
+                               id="egeScore"
+                               min="0" 
+                               max="300"
+                               placeholder="Например: 250"
+                               required
+                               oninput="calculateRating()">
+                        <i class="fas fa-chart-line input-icon"></i>
+                    </div>
+                    <small class="text-muted">Сумма баллов по трём предметам</small>
+                </div>
+
+                <div class="form-field">
+                    <label class="field-label">
+                        Тип аттестата/диплома
+                        <span class="required-mark">*</span>
+                    </label>
+                    <div class="input-group-custom">
+                        <select class="form-control-custom form-select-custom" 
+                                name="diploma_type" 
+                                id="diplomaType"
+                                required
+                                onchange="calculateRating()">
+                            <option value="" disabled selected>Выберите тип</option>
+                            <option value="regular">Обычный аттестат/диплом</option>
+                            <option value="red_high_school">Аттестат с отличием (школа) +50 баллов</option>
+                            <option value="red_college">Диплом с отличием (СПО) +40 баллов</option>
+                        </select>
+                        <i class="fas fa-certificate input-icon"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-field">
+                    <label class="field-label">
+                        Расстояние от места жительства
+                        <span class="field-hint">в километрах</span>
+                    </label>
+                    <div class="input-group-custom">
+                        <input type="number" 
+                               class="form-control-custom" 
+                               name="distance_km" 
+                               id="distanceKm"
+                               min="0"
+                               placeholder="Например: 650"
+                               oninput="calculateRating()">
+                        <i class="fas fa-map-marker-alt input-icon"></i>
+                    </div>
+                    <small class="text-muted">
+                        >500 км: +30 баллов, >1000 км: +50 баллов
+                    </small>
+                </div>
+
+                <div class="form-field">
+                    <label class="field-label">
+                        Курс обучения
+                        <span class="required-mark">*</span>
+                    </label>
+                    <div class="input-group-custom">
+                        <select class="form-control-custom form-select-custom" 
+                                name="course" 
+                                required>
+                            <option value="" disabled selected>Выберите курс</option>
+                            <option value="1">1 курс (бакалавриат/специалитет)</option>
+                            <option value="2">2 курс</option>
+                            <option value="3">3 курс</option>
+                            <option value="4">4 курс</option>
+                            <option value="5">5 курс и выше</option>
+                            <option value="master">Магистратура (1 курс)</option>
+                            <option value="master2">Магистратура (2 курс)</option>
+                        </select>
+                        <i class="fas fa-layer-group input-icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Benefits -->
+        <div class="form-section" id="step3" style="display: none;">
+            <div class="section-header">
+                <div class="section-icon" style="background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); color: #dc2626;">
+                    <i class="fas fa-hands-helping"></i>
+                </div>
+                <div>
+                    <h2 class="section-title">Льготные категории</h2>
+                    <p class="section-description">Отметьте applicable категории для приоритетного заселения</p>
+                </div>
+            </div>
+
+            <div class="info-card" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-left-color: #f59e0b;">
+                <div class="info-icon" style="color: #d97706;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="info-content">
+                    <h5 class="info-title" style="color: #92400e;">Требуется подтверждение</h5>
+                    <p class="info-text" style="color: #78350f;">
+                        Для каждой выбранной льготной категории необходимо будет загрузить 
+                        подтверждающие документы на следующем этапе.
+                    </p>
+                </div>
+            </div>
+
+            <div class="checkbox-group">
+                <label class="checkbox-item">
+                    <input type="checkbox" 
+                           name="is_orphan" 
+                           id="isOrphan"
+                           onchange="calculateRating()">
+                    <div class="checkbox-content">
+                        <span class="checkbox-label">
+                            <i class="fas fa-heart me-2" style="color: var(--error);"></i>
+                            Ребёнок-сирота или ребёнок, оставшийся без попечения родителей
+                        </span>
+                        <span class="checkbox-description">
+                            Предоставляется приоритетное право на заселение (+1000 баллов)
+                        </span>
+                    </div>
+                </label>
+
+                <label class="checkbox-item">
+                    <input type="checkbox" 
+                           name="is_disabled" 
+                           id="isDisabled"
+                           onchange="calculateRating()">
+                    <div class="checkbox-content">
+                        <span class="checkbox-label">
+                            <i class="fas fa-wheelchair me-2" style="color: var(--primary-600);"></i>
+                            Инвалид I или II группы
+                        </span>
+                        <span class="checkbox-description">
+                            Предоставляется приоритетное право на заселение (+1000 баллов)
+                        </span>
+                    </div>
+                </label>
+
+                <label class="checkbox-item">
+                    <input type="checkbox" 
+                           name="has_priority_benefit" 
+                           id="hasPriorityBenefit"
+                           onchange="calculateRating()">
+                    <div class="checkbox-content">
+                        <span class="checkbox-label">
+                            <i class="fas fa-shield-alt me-2" style="color: var(--secondary-600);"></i>
+                            Иные льготные категории (ФЗ №273)
+                        </span>
+                        <span class="checkbox-description">
+                            Включая детей-инвалидов, ветеранов боевых действий и другие категории (+500 баллов)
+                        </span>
+                    </div>
+                </label>
+            </div>
+
+            <div class="form-row" style="margin-top: 2rem;">
+                <div class="form-field full-width">
+                    <label class="field-label">
+                        Дополнительные достижения
+                    </label>
+                    <textarea class="form-control-custom" 
+                              name="achievements" 
+                              rows="4"
+                              placeholder="Опишите ваши достижения: олимпиады, гранты, волонтёрская деятельность и т.д."></textarea>
+                    <small class="text-muted">
+                        Эта информация может быть учтена при распределении мест
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Confirmation -->
+        <div class="form-section" id="step4" style="display: none;">
+            <div class="section-header">
+                <div class="section-icon" style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); color: #059669;">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div>
+                    <h2 class="section-title">Проверка данных</h2>
+                    <p class="section-description">Внимательно проверьте всю введённую информацию</p>
+                </div>
+            </div>
+
+            <div class="rating-preview" id="ratingPreview">
+                <div class="rating-value" id="totalRating">0</div>
+                <div class="rating-label">Ваш рейтинговый балл</div>
+                
+                <div class="rating-breakdown">
+                    <div class="breakdown-item">
+                        <div class="breakdown-label">Баллы ЕГЭ</div>
+                        <div class="breakdown-value" id="egeBreakdown">0</div>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="breakdown-label">Аттестат</div>
+                        <div class="breakdown-value" id="diplomaBreakdown">0</div>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="breakdown-label">Расстояние</div>
+                        <div class="breakdown-value" id="distanceBreakdown">0</div>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="breakdown-label">Льготы</div>
+                        <div class="breakdown-value" id="benefitBreakdown">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row" style="margin-top: 2rem;">
+                <div class="form-field full-width">
+                    <label class="checkbox-item" style="background: linear-gradient(135deg, var(--primary-50) 0%, var(--secondary-50) 100%); border-color: var(--primary-300);">
+                        <input type="checkbox" 
+                               name="agreement" 
+                               id="agreement"
+                               required>
+                        <div class="checkbox-content">
+                            <span class="checkbox-label">
+                                Я даю согласие на обработку персональных данных
+                            </span>
+                            <span class="checkbox-description">
+                                В соответствии с Федеральным законом №152-ФЗ «О персональных данных» 
+                                я даю согласие на обработку моих персональных данных для целей 
+                                предоставления места в общежитии
+                            </span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-field full-width">
+                    <label class="checkbox-item">
+                        <input type="checkbox" 
+                               name="accuracy" 
+                               id="accuracy"
+                               required>
+                        <div class="checkbox-content">
+                            <span class="checkbox-label">
+                                Подтверждаю достоверность предоставленных данных
+                            </span>
+                            <span class="checkbox-description">
+                                Я подтверждаю, что все указанные сведения являются достоверными 
+                                и полными. Понимаю, что предоставление ложной информации может 
+                                привести к отказу в заселении
+                            </span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="button-group">
+            <button type="button" 
+                    class="btn-custom btn-ghost-custom" 
+                    id="prevBtn" 
+                    onclick="changeStep(-1)"
+                    style="display: none;">
+                <i class="fas fa-arrow-left"></i>
+                Назад
+            </button>
+            
+            <button type="button" 
+                    class="btn-custom btn-outline-custom" 
+                    id="saveDraftBtn"
+                    onclick="saveAsDraft()">
+                <i class="fas fa-save"></i>
+                Сохранить черновик
+            </button>
+
+            <div style="flex: 1;"></div>
+
+            <button type="button" 
+                    class="btn-custom btn-primary-custom" 
+                    id="nextBtn"
+                    onclick="changeStep(1)">
+                Далее
+                <i class="fas fa-arrow-right"></i>
+            </button>
+
+            <button type="submit" 
+                    class="btn-custom btn-submit-primary" 
+                    id="submitBtn"
+                    style="display: none;">
+                <i class="fas fa-paper-plane"></i>
+                Отправить заявку
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentStep = 1;
+    const totalSteps = 4;
+
+    function changeStep(direction) {
+        // Validate current step before proceeding
+        if (direction > 0 && !validateStep(currentStep)) {
+            return;
+        }
+
+        // Hide current step
+        document.getElementById(`step${currentStep}`).style.display = 'none';
+        document.querySelector(`.wizard-step[data-step="${currentStep}"]`).classList.remove('active');
+        document.querySelector(`.wizard-step[data-step="${currentStep}"]`).classList.add('completed');
+
+        // Update step counter
+        currentStep += direction;
+
+        // Show new step
+        document.getElementById(`step${currentStep}`).style.display = 'block';
+        document.querySelector(`.wizard-step[data-step="${currentStep}"]`).classList.add('active');
+
+        // Update buttons
+        updateButtons();
+
+        // Calculate rating when reaching step 4
+        if (currentStep === 4) {
+            calculateRating();
+        }
+
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function updateButtons() {
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const submitBtn = document.getElementById('submitBtn');
+
+        prevBtn.style.display = currentStep === 1 ? 'none' : 'inline-flex';
+        
+        if (currentStep === totalSteps) {
+            nextBtn.style.display = 'none';
+            submitBtn.style.display = 'inline-flex';
+        } else {
+            nextBtn.style.display = 'inline-flex';
+            submitBtn.style.display = 'none';
+        }
+    }
+
+    function validateStep(step) {
+        const stepElement = document.getElementById(`step${step}`);
+        const inputs = stepElement.querySelectorAll('input[required], select[required]');
+        let isValid = true;
+
+        inputs.forEach(input => {
+            if (!input.value.trim()) {
+                isValid = false;
+                input.style.borderColor = 'var(--error)';
+                
+                // Show validation message
+                const validationMsg = document.createElement('div');
+                validationMsg.className = 'validation-message';
+                validationMsg.innerHTML = '<i class="fas fa-exclamation-circle"></i> Это поле обязательно для заполнения';
+                
+                if (!input.parentElement.nextElementSibling?.classList.contains('validation-message')) {
+                    input.parentElement.after(validationMsg);
+                }
+            } else {
+                input.style.borderColor = 'var(--border-light)';
+                const existingMsg = input.parentElement.nextElementSibling;
+                if (existingMsg?.classList.contains('validation-message')) {
+                    existingMsg.remove();
+                }
+            }
+        });
+
+        if (!isValid) {
+            showAlert('error', 'Пожалуйста, заполните все обязательные поля');
+        }
+
+        return isValid;
+    }
+
+    function calculateRating() {
+        let totalScore = 0;
+        let egeScore = 0;
+        let diplomaScore = 0;
+        let distanceScore = 0;
+        let benefitScore = 0;
+
+        // ЕГЭ
+        const egeInput = document.getElementById('egeScore');
+        if (egeInput && egeInput.value) {
+            egeScore = parseFloat(egeInput.value);
+            totalScore += egeScore;
+        }
+
+        // Аттестат
+        const diplomaSelect = document.getElementById('diplomaType');
+        if (diplomaSelect) {
+            switch(diplomaSelect.value) {
+                case 'red_high_school':
+                    diplomaScore = 50;
+                    break;
+                case 'red_college':
+                    diplomaScore = 40;
+                    break;
+                default:
+                    diplomaScore = 0;
+            }
+            totalScore += diplomaScore;
+        }
+
+        // Расстояние
+        const distanceInput = document.getElementById('distanceKm');
+        if (distanceInput && distanceInput.value) {
+            const distance = parseInt(distanceInput.value);
+            if (distance > 1000) {
+                distanceScore = 50;
+            } else if (distance > 500) {
+                distanceScore = 30;
+            }
+            totalScore += distanceScore;
+        }
+
+        // Льготы
+        if (document.getElementById('isOrphan')?.checked || document.getElementById('isDisabled')?.checked) {
+            benefitScore = 1000;
+        } else if (document.getElementById('hasPriorityBenefit')?.checked) {
+            benefitScore = 500;
+        }
+        totalScore += benefitScore;
+
+        // Update display
+        document.getElementById('totalRating').textContent = totalScore.toFixed(2);
+        document.getElementById('egeBreakdown').textContent = egeScore.toFixed(2);
+        document.getElementById('diplomaBreakdown').textContent = diplomaScore;
+        document.getElementById('distanceBreakdown').textContent = distanceScore;
+        document.getElementById('benefitBreakdown').textContent = benefitScore;
+    }
+
+    function saveAsDraft() {
+        const btn = document.getElementById('saveDraftBtn');
+        btn.classList.add('btn-loading');
+        
+        // Simulate save
+        setTimeout(() => {
+            btn.classList.remove('btn-loading');
+            showAlert('success', 'Черновик успешно сохранён');
+        }, 1000);
+    }
+
+    function showAlert(type, message) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert-custom alert-${type === 'success' ? 'success' : 'error'}-custom`;
+        alertDiv.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check' : 'exclamation'}-circle"></i>
+            <div>${message}</div>
+            <button type="button" class="btn-close ms-auto" onclick="this.parentElement.remove()"></button>
+        `;
+        
+        document.querySelector('.application-wizard').before(alertDiv);
+        
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 5000);
+    }
+
+    // Form submission
+    document.getElementById('applicationForm').addEventListener('submit', function(e) {
+        if (!validateStep(currentStep)) {
+            e.preventDefault();
+            return;
+        }
+
+        const agreement = document.getElementById('agreement');
+        const accuracy = document.getElementById('accuracy');
+        
+        if (!agreement.checked || !accuracy.checked) {
+            e.preventDefault();
+            showAlert('error', 'Необходимо подтвердить согласие и достоверность данных');
+            return;
+        }
+
+        // Show loading state
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.classList.add('btn-loading');
+    });
+
+    // Phone mask
+    document.querySelector('input[name="phone"]')?.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length > 0) {
+            if (value[0] === '7' || value[0] === '8') {
+                value = value.substring(1);
+            }
+            let formattedValue = '+7';
+            if (value.length > 0) {
+                formattedValue += ' (' + value.substring(0, 3);
+            }
+            if (value.length >= 3) {
+                formattedValue += ') ' + value.substring(3, 6);
+            }
+            if (value.length >= 6) {
+                formattedValue += '-' + value.substring(6, 8);
+            }
+            if (value.length >= 8) {
+                formattedValue += '-' + value.substring(8, 10);
+            }
+            e.target.value = formattedValue;
+        }
+    });
+</script>
+{% endblock %}

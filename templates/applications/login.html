@@ -1,0 +1,501 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Вход в систему — Заселение РГСУ{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ============================================
+       LOGIN PAGE STYLES
+       ============================================ */
+    
+    .login-container {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        position: relative;
+    }
+
+    .login-container::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 20% 30%, rgba(102, 126, 234, 0.15) 0%, transparent 50%),
+            radial-gradient(circle at 80% 70%, rgba(32, 232, 144, 0.15) 0%, transparent 50%),
+            radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 60%);
+        z-index: -1;
+    }
+
+    .login-card {
+        background: white;
+        border-radius: var(--radius-2xl);
+        box-shadow: var(--shadow-2xl), 0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+        width: 100%;
+        max-width: 480px;
+        overflow: hidden;
+        animation: fadeInUp 0.8s ease-out;
+        position: relative;
+    }
+
+    .login-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: linear-gradient(90deg, var(--primary-500), var(--secondary-500), var(--accent-violet));
+    }
+
+    .login-header {
+        padding: 3rem 2.5rem 2rem;
+        text-align: center;
+        background: linear-gradient(135deg, var(--primary-50) 0%, var(--secondary-50) 100%);
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .login-logo {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-700) 100%);
+        border-radius: var(--radius-xl);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        animation: float 3s ease-in-out infinite;
+    }
+
+    .login-logo i {
+        font-size: 2.5rem;
+        color: white;
+    }
+
+    .login-title {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .login-subtitle {
+        color: var(--text-secondary);
+        font-size: 0.9375rem;
+    }
+
+    .login-body {
+        padding: 2.5rem;
+    }
+
+    .form-group-login {
+        margin-bottom: 1.75rem;
+        position: relative;
+    }
+
+    .login-label {
+        display: block;
+        font-weight: 600;
+        font-size: 0.9375rem;
+        color: var(--text-primary);
+        margin-bottom: 0.75rem;
+    }
+
+    .login-input-wrapper {
+        position: relative;
+    }
+
+    .login-input {
+        width: 100%;
+        padding: 1rem 1.25rem;
+        padding-left: 3.5rem;
+        font-size: 1rem;
+        font-family: var(--font-sans);
+        border: 2px solid var(--border-light);
+        border-radius: var(--radius-lg);
+        background: var(--gray-50);
+        transition: all var(--transition-fast);
+        outline: none;
+    }
+
+    .login-input:focus {
+        border-color: var(--primary-500);
+        background: white;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    .login-input-icon {
+        position: absolute;
+        left: 1.25rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-tertiary);
+        font-size: 1.25rem;
+        transition: all var(--transition-fast);
+        pointer-events: none;
+    }
+
+    .login-input:focus + .login-input-icon {
+        color: var(--primary-600);
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 1.25rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: var(--text-tertiary);
+        cursor: pointer;
+        padding: 0.25rem;
+        transition: color var(--transition-fast);
+    }
+
+    .password-toggle:hover {
+        color: var(--primary-600);
+    }
+
+    .login-options {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        font-size: 0.9375rem;
+    }
+
+    .remember-me {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+    }
+
+    .remember-me input[type="checkbox"] {
+        width: 1.125rem;
+        height: 1.125rem;
+        accent-color: var(--primary-600);
+        cursor: pointer;
+    }
+
+    .forgot-link {
+        color: var(--primary-600);
+        text-decoration: none;
+        font-weight: 600;
+        transition: color var(--transition-fast);
+    }
+
+    .forgot-link:hover {
+        color: var(--primary-800);
+        text-decoration: underline;
+    }
+
+    .login-btn {
+        width: 100%;
+        padding: 1.125rem;
+        background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-700) 100%);
+        color: white;
+        border: none;
+        border-radius: var(--radius-lg);
+        font-size: 1.125rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+
+    .login-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+    }
+
+    .login-btn:active {
+        transform: translateY(0);
+    }
+
+    .login-btn.loading {
+        pointer-events: none;
+        opacity: 0.8;
+    }
+
+    .login-btn.loading::after {
+        content: '';
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    .login-footer {
+        padding: 2rem 2.5rem;
+        background: var(--gray-50);
+        border-top: 1px solid var(--border-light);
+        text-align: center;
+    }
+
+    .login-footer-text {
+        color: var(--text-secondary);
+        font-size: 0.9375rem;
+        margin-bottom: 1rem;
+    }
+
+    .help-links {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .help-link {
+        color: var(--primary-600);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+        transition: all var(--transition-fast);
+    }
+
+    .help-link:hover {
+        color: var(--primary-800);
+        transform: translateY(-1px);
+    }
+
+    .error-alert {
+        background: var(--error-light);
+        border-left: 4px solid var(--error);
+        padding: 1rem 1.25rem;
+        border-radius: var(--radius-lg);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: #991b1b;
+        font-weight: 500;
+        animation: slideInRight 0.4s ease-out;
+    }
+
+    .error-alert i {
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+
+    .input-error {
+        border-color: var(--error) !important;
+        background: var(--error-light) !important;
+    }
+
+    .error-message {
+        color: var(--error);
+        font-size: 0.8125rem;
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+    }
+
+    @media (max-width: 576px) {
+        .login-container {
+            padding: 1rem;
+        }
+
+        .login-header, .login-body, .login-footer {
+            padding: 1.5rem;
+        }
+
+        .login-title {
+            font-size: 1.5rem;
+        }
+
+        .login-options {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .help-links {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <div class="login-logo">
+                <i class="fas fa-building"></i>
+            </div>
+            <h1 class="login-title">Вход в систему</h1>
+            <p class="login-subtitle">Информационная система заселения в общежития РГСУ</p>
+        </div>
+
+        <div class="login-body">
+            {% if form.errors %}
+            <div class="error-alert">
+                <i class="fas fa-exclamation-circle"></i>
+                <div>
+                    {% if form.username.errors and form.password.errors %}
+                        Неверное имя пользователя или пароль. Пожалуйста, попробуйте снова.
+                    {% elif form.username.errors %}
+                        {{ form.username.errors }}
+                    {% elif form.password.errors %}
+                        {{ form.password.errors }}
+                    {% else %}
+                        Произошла ошибка при входе. Проверьте данные и попробуйте снова.
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <form method="post" action="{% url 'login' %}" id="loginForm" novalidate>
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ next }}">
+
+                <div class="form-group-login">
+                    <label class="login-label" for="id_username">Имя пользователя или Email</label>
+                    <div class="login-input-wrapper">
+                        <input type="text" 
+                               name="username" 
+                               id="id_username" 
+                               class="login-input {% if form.username.errors %}input-error{% endif %}"
+                               placeholder="Введите логин или email"
+                               required
+                               autocomplete="username"
+                               autofocus>
+                        <i class="fas fa-user login-input-icon"></i>
+                    </div>
+                    {% if form.username.errors %}
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            {{ form.username.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group-login">
+                    <label class="login-label" for="id_password">Пароль</label>
+                    <div class="login-input-wrapper">
+                        <input type="password" 
+                               name="password" 
+                               id="id_password" 
+                               class="login-input {% if form.password.errors %}input-error{% endif %}"
+                               placeholder="Введите пароль"
+                               required
+                               autocomplete="current-password">
+                        <i class="fas fa-lock login-input-icon"></i>
+                        <button type="button" class="password-toggle" id="togglePassword" aria-label="Показать пароль">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    {% if form.password.errors %}
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            {{ form.password.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="login-options">
+                    <label class="remember-me">
+                        <input type="checkbox" name="remember" id="remember">
+                        <span>Запомнить меня</span>
+                    </label>
+                    <a href="#" class="forgot-link" onclick="alert('Функция восстановления пароля будет доступна после интеграции с почтовым сервером университета')">
+                        Забыли пароль?
+                    </a>
+                </div>
+
+                <button type="submit" class="login-btn" id="submitBtn">
+                    <span>Войти в систему</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+        </div>
+
+        <div class="login-footer">
+            <p class="login-footer-text">Нужна помощь или возникли вопросы?</p>
+            <div class="help-links">
+                <a href="mailto:support@rgsu.net" class="help-link">
+                    <i class="fas fa-envelope"></i>
+                    support@rgsu.net
+                </a>
+                <a href="tel:+74951234567" class="help-link">
+                    <i class="fas fa-phone"></i>
+                    +7 (495) 123-45-67
+                </a>
+                <a href="#" class="help-link" onclick="alert('Инструкция по восстановлению доступа отправлена на вашу почту')">
+                    <i class="fas fa-question-circle"></i>
+                    Инструкция
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle password visibility
+        const toggleBtn = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('id_password');
+        
+        if (toggleBtn && passwordInput) {
+            toggleBtn.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                
+                const icon = this.querySelector('i');
+                icon.classList.toggle('fa-eye');
+                icon.classList.toggle('fa-eye-slash');
+            });
+        }
+
+        // Form submission loading state
+        const form = document.getElementById('loginForm');
+        const submitBtn = document.getElementById('submitBtn');
+        
+        if (form && submitBtn) {
+            form.addEventListener('submit', function() {
+                submitBtn.classList.add('loading');
+                submitBtn.querySelector('span').textContent = 'Вход...';
+                submitBtn.querySelector('i').style.display = 'none';
+            });
+        }
+
+        // Input focus animations
+        const inputs = document.querySelectorAll('.login-input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+        });
+
+        // Auto-focus username field if empty
+        const usernameInput = document.getElementById('id_username');
+        if (usernameInput && !usernameInput.value) {
+            usernameInput.focus();
+        }
+    });
+</script>
+{% endblock %}

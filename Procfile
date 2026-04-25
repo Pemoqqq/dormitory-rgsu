@@ -1,0 +1,1 @@
+web: gunicorn rgsu_dorm.wsgi:application --log-file -web: gunicorn rgsu_dorm.wsgi:application --log-file -

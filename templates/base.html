@@ -1,0 +1,955 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Информационная система заселения в общежития РГСУ">
+    <meta name="theme-color" content="#4f70e0">
+    <title>{% block title %}Заселение РГСУ — Информационная система{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800;900&family=Geologica:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        /* ============================================
+           DESIGN SYSTEM — RGSU DORMITORY SYSTEM
+           ============================================ */
+
+        :root {
+            --primary-50:  #f0f4ff;
+            --primary-100: #e0eaff;
+            --primary-200: #c9daff;
+            --primary-300: #a8c2ff;
+            --primary-400: #7fa0ff;
+            --primary-500: #4f70e0;
+            --primary-600: #3d5dd4;
+            --primary-700: #2c4abf;
+            --primary-800: #1e358a;
+            --primary-900: #14256b;
+
+            --secondary-50:  #f0fdf4;
+            --secondary-100: #dcfce7;
+            --secondary-200: #bbf7d0;
+            --secondary-300: #86efac;
+            --secondary-400: #4ade80;
+            --secondary-500: #22c55e;
+            --secondary-600: #16a34a;
+            --secondary-700: #15803d;
+            --secondary-800: #166534;
+            --secondary-900: #14532d;
+
+            --accent-coral:  #ff6b6b;
+            --accent-amber:  #f59e0b;
+            --accent-violet: #8b5cf6;
+            --accent-cyan:   #06b6d4;
+
+            --gray-50:  #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+
+            --success:       #10b981;
+            --success-light: #d1fae5;
+            --warning:       #f59e0b;
+            --warning-light: #fef3c7;
+            --error:         #ef4444;
+            --error-light:   #fee2e2;
+            --info:          #3b82f6;
+            --info-light:    #dbeafe;
+
+            --bg-primary:   #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-dark:      #111827;
+
+            --text-primary:   #111827;
+            --text-secondary: #4b5563;
+            --text-tertiary:  #6b7280;
+            --text-inverse:   #ffffff;
+
+            --border-light:  #e5e7eb;
+            --border-medium: #d1d5db;
+
+            --shadow-xs:  0 1px 2px rgba(0,0,0,0.05);
+            --shadow-sm:  0 1px 3px rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1);
+            --shadow-md:  0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+            --shadow-lg:  0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+            --shadow-xl:  0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+            --shadow-2xl: 0 25px 50px -12px rgba(0,0,0,0.25);
+            --shadow-glow:0 0 20px rgba(79,112,224,0.5);
+
+            --font-sans: 'Geologica', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-head: 'Unbounded', sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+            --transition-fast:   150ms cubic-bezier(0.4,0,0.2,1);
+            --transition-base:   250ms cubic-bezier(0.4,0,0.2,1);
+            --transition-slow:   350ms cubic-bezier(0.4,0,0.2,1);
+            --transition-bounce: 500ms cubic-bezier(0.68,-0.55,0.265,1.55);
+
+            --radius-sm:   0.375rem;
+            --radius-md:   0.5rem;
+            --radius-lg:   0.75rem;
+            --radius-xl:   1rem;
+            --radius-2xl:  1.5rem;
+            --radius-full: 9999px;
+
+            --z-dropdown: 1000;
+            --z-sticky:   1020;
+            --z-fixed:    1030;
+            --z-modal:    1050;
+        }
+
+        /* ── RESET ── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+        body {
+            font-family: var(--font-sans);
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, #eef2ff 0%, #e0f2fe 50%, #f0fdf4 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── ANIMATIONS ── */
+        @keyframes fadeIn       { from{opacity:0}           to{opacity:1} }
+        @keyframes fadeInUp     { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes fadeInDown   { from{opacity:0;transform:translateY(-30px)}to{opacity:1;transform:translateY(0)} }
+        @keyframes slideInLeft  { from{opacity:0;transform:translateX(-50px)}to{opacity:1;transform:translateX(0)} }
+        @keyframes slideInRight { from{opacity:0;transform:translateX(50px)} to{opacity:1;transform:translateX(0)} }
+        @keyframes scaleIn      { from{opacity:0;transform:scale(0.9)}       to{opacity:1;transform:scale(1)} }
+        @keyframes spin         { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+        @keyframes shimmer      { 0%{background-position:-1000px 0} 100%{background-position:1000px 0} }
+        @keyframes pulse        { 0%,100%{opacity:1} 50%{opacity:0.5} }
+        @keyframes float        { 0%,100%{transform:translateY(0)}  50%{transform:translateY(-16px)} }
+        @keyframes gradient     { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+        @keyframes dropdownIn   { from{opacity:0;transform:translateY(-10px) scale(0.97)} to{opacity:1;transform:translateY(0) scale(1)} }
+        @keyframes toastIn      { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+        .animate-fade-in      { animation: fadeIn      0.6s ease-out; }
+        .animate-fade-in-up   { animation: fadeInUp    0.6s ease-out; }
+        .animate-fade-in-down { animation: fadeInDown  0.6s ease-out; }
+        .animate-scale-in     { animation: scaleIn     0.4s ease-out; }
+        .animate-float        { animation: float       3s ease-in-out infinite; }
+        .animate-pulse-slow   { animation: pulse       2s cubic-bezier(0.4,0,0.6,1) infinite; }
+        .animate-gradient     { background-size:200% 200%; animation: gradient 3s ease infinite; }
+
+        /* ── UTILITIES ── */
+        .text-gradient {
+            background: linear-gradient(135deg, var(--primary-500) 0%, var(--accent-violet) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .glass {
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.35);
+        }
+
+        /* ============================================
+           NAVIGATION BAR
+           ============================================ */
+
+        .navbar-custom {
+            background: linear-gradient(135deg, var(--primary-700) 0%, var(--primary-900) 50%, #1a1060 100%);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 4px 30px rgba(0,0,0,0.15), 0 0 20px rgba(79,112,224,0.25);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding: 0.875rem 0;
+            transition: all var(--transition-base);
+            position: relative;
+            z-index: var(--z-fixed);
+        }
+        .navbar-custom::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.04) 50%, transparent 100%);
+            pointer-events: none;
+        }
+        .navbar-custom.scrolled {
+            padding: 0.5rem 0;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.25), 0 0 30px rgba(79,112,224,0.35);
+        }
+
+        /* Brand */
+        .navbar-brand-custom {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-family: var(--font-head);
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: var(--text-inverse);
+            text-decoration: none;
+            transition: all var(--transition-fast);
+            position: relative;
+            z-index: 1;
+            letter-spacing: -0.01em;
+        }
+        .navbar-brand-custom:hover { transform: translateY(-2px); color: var(--text-inverse); }
+        .brand-icon {
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, var(--secondary-400) 0%, var(--secondary-600) 100%);
+            border-radius: var(--radius-xl);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 15px rgba(34,197,94,0.4);
+            transition: all var(--transition-bounce);
+            flex-shrink: 0;
+        }
+        .navbar-brand-custom:hover .brand-icon { transform: rotate(15deg) scale(1.1); }
+        .brand-icon i { font-size: 1.375rem; color: white; }
+        .brand-sub {
+            font-family: var(--font-sans);
+            font-size: 0.6875rem;
+            font-weight: 400;
+            opacity: 0.65;
+            display: block;
+            letter-spacing: 0.04em;
+            margin-top: -2px;
+        }
+
+        /* Nav links */
+        .nav-link-custom {
+            color: rgba(255,255,255,0.88);
+            font-weight: 500;
+            font-size: 0.9rem;
+            padding: 0.55rem 1rem;
+            border-radius: var(--radius-lg);
+            transition: all var(--transition-fast);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            position: relative;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .nav-link-custom::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,0.1);
+            opacity: 0;
+            transition: opacity var(--transition-fast);
+            border-radius: inherit;
+        }
+        .nav-link-custom:hover::before { opacity: 1; }
+        .nav-link-custom:hover { color: white; transform: translateY(-1px); }
+        .nav-link-custom.active {
+            background: rgba(255,255,255,0.18);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .nav-link-custom i { font-size: 0.9rem; }
+
+        /* ─────────────────────────────────────────────
+           USER DROPDOWN — replaces the old static badge
+           ───────────────────────────────────────────── */
+        .user-menu-wrapper {
+            position: relative;
+        }
+
+        .user-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.45rem 0.875rem 0.45rem 0.45rem;
+            background: rgba(255,255,255,0.12);
+            border: 1.5px solid rgba(255,255,255,0.2);
+            border-radius: var(--radius-full);
+            color: white;
+            font-family: var(--font-sans);
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            backdrop-filter: blur(8px);
+            /* reset button styles */
+            outline: none;
+            text-decoration: none;
+        }
+        .user-toggle:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.4);
+            transform: translateY(-1px);
+        }
+        .user-toggle.open {
+            background: rgba(255,255,255,0.22);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        .user-avatar {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, var(--secondary-400), var(--secondary-600));
+            border-radius: var(--radius-full);
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-head);
+            font-weight: 700;
+            font-size: 0.8125rem;
+            color: white;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+        }
+        .user-name-text { max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .chevron-icon {
+            font-size: 0.7rem;
+            transition: transform var(--transition-fast);
+            opacity: 0.75;
+        }
+        .user-toggle.open .chevron-icon { transform: rotate(180deg); }
+
+        /* Dropdown panel */
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 0.625rem);
+            right: 0;
+            min-width: 220px;
+            background: white;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-2xl), 0 0 0 1px rgba(0,0,0,0.06);
+            padding: 0.5rem;
+            z-index: var(--z-dropdown);
+            animation: dropdownIn 0.2s ease-out;
+            display: none;
+        }
+        .user-dropdown.open { display: block; }
+
+        .dropdown-header {
+            padding: 0.75rem 0.875rem 0.625rem;
+            border-bottom: 1px solid var(--border-light);
+            margin-bottom: 0.375rem;
+        }
+        .dropdown-header-name {
+            font-weight: 700;
+            font-size: 0.9375rem;
+            color: var(--text-primary);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .dropdown-header-role {
+            font-size: 0.78rem;
+            color: var(--text-tertiary);
+            margin-top: 0.1rem;
+        }
+
+        .dropdown-item-custom {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            padding: 0.6rem 0.875rem;
+            border-radius: var(--radius-lg);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all var(--transition-fast);
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-family: var(--font-sans);
+        }
+        .dropdown-item-custom i { width: 16px; text-align: center; font-size: 0.875rem; flex-shrink: 0; color: var(--text-tertiary); transition: color var(--transition-fast); }
+        .dropdown-item-custom:hover { background: var(--primary-50); color: var(--primary-700); }
+        .dropdown-item-custom:hover i { color: var(--primary-600); }
+
+        .dropdown-divider { height: 1px; background: var(--border-light); margin: 0.375rem 0; }
+
+        /* Logout item — red tint */
+        .dropdown-item-logout:hover { background: var(--error-light); color: #991b1b; }
+        .dropdown-item-logout:hover i { color: #dc2626; }
+
+        /* Logout form (hidden, triggered by button) */
+        .logout-form { display: none; }
+
+        /* ── MAIN CONTAINER ── */
+        .main-container {
+            min-height: calc(100vh - 80px);
+            padding: 2.5rem 0;
+            position: relative;
+        }
+        .main-container::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(79,112,224,0.07) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(34,197,94,0.07) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(139,92,246,0.07) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* ── CARDS ── */
+        .card-custom {
+            background: white;
+            border: none;
+            border-radius: var(--radius-2xl);
+            box-shadow: var(--shadow-xl), 0 0 0 1px rgba(255,255,255,0.5) inset;
+            overflow: hidden;
+            transition: all var(--transition-base);
+            position: relative;
+        }
+        .card-custom::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-500), var(--secondary-500), var(--accent-violet));
+            opacity: 0;
+            transition: opacity var(--transition-base);
+        }
+        .card-custom:hover { transform: translateY(-5px); box-shadow: var(--shadow-2xl), 0 0 0 1px rgba(255,255,255,0.5) inset; }
+        .card-custom:hover::before { opacity: 1; }
+
+        .card-header-custom {
+            background: linear-gradient(135deg, var(--primary-50) 0%, var(--secondary-50) 100%);
+            border-bottom: 1px solid var(--border-light);
+            padding: 1.5rem 2rem;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .card-header-custom i { color: var(--primary-600); font-size: 1.5rem; }
+        .card-body-custom { padding: 2rem; }
+
+        /* ── BUTTONS ── */
+        .btn-custom {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            font-family: var(--font-sans);
+            font-weight: 600;
+            font-size: 0.9375rem;
+            border-radius: var(--radius-lg);
+            border: none;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .btn-custom::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
+            transition: left var(--transition-slow);
+        }
+        .btn-custom:hover::before { left: 100%; }
+        .btn-custom i { font-size: 1.05rem; }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-700) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(79,112,224,0.4);
+        }
+        .btn-primary-custom:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(79,112,224,0.5); color: white; }
+
+        .btn-secondary-custom {
+            background: linear-gradient(135deg, var(--secondary-500) 0%, var(--secondary-700) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(34,197,94,0.35);
+        }
+        .btn-secondary-custom:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(34,197,94,0.5); color: white; }
+
+        .btn-outline-custom {
+            background: transparent;
+            border: 2px solid var(--primary-500);
+            color: var(--primary-600);
+        }
+        .btn-outline-custom:hover { background: var(--primary-500); color: white; transform: translateY(-2px); }
+
+        .btn-ghost-custom { background: transparent; color: var(--text-secondary); }
+        .btn-ghost-custom:hover { background: var(--gray-100); color: var(--text-primary); }
+
+        .btn-sm-custom  { padding: 0.5rem 1rem;    font-size: 0.875rem; }
+        .btn-lg-custom  { padding: 1rem 2rem;       font-size: 1.125rem; }
+
+        /* ── FORMS ── */
+        .form-group-custom { margin-bottom: 1.5rem; }
+        .form-label-custom { display: block; font-weight: 600; font-size: 0.9375rem; color: var(--text-primary); margin-bottom: 0.5rem; }
+        .form-control-custom {
+            width: 100%;
+            padding: 0.875rem 1.25rem;
+            font-size: 1rem;
+            font-family: var(--font-sans);
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            background: white;
+            transition: all var(--transition-fast);
+            outline: none;
+            color: var(--text-primary);
+        }
+        .form-control-custom:focus { border-color: var(--primary-500); box-shadow: 0 0 0 4px rgba(79,112,224,0.1); }
+        .form-control-custom::placeholder { color: var(--text-tertiary); }
+        .form-select-custom {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+        .form-check-custom {
+            display: flex; align-items: center; gap: 0.75rem;
+            padding: 0.75rem;
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .form-check-custom:hover { border-color: var(--primary-300); background: var(--primary-50); }
+        .form-check-custom input[type="checkbox"],
+        .form-check-custom input[type="radio"] { width: 1.25rem; height: 1.25rem; cursor: pointer; accent-color: var(--primary-500); }
+        .form-check-label-custom { font-weight: 500; cursor: pointer; user-select: none; }
+
+        /* ── ALERTS ── */
+        .alert-custom {
+            padding: 1.125rem 1.5rem;
+            border-radius: var(--radius-xl);
+            border: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            animation: slideInRight 0.4s ease-out;
+            box-shadow: var(--shadow-lg);
+        }
+        .alert-custom i { font-size: 1.375rem; flex-shrink: 0; }
+        .alert-success-custom { background: linear-gradient(135deg, var(--success-light) 0%, #a7f3d0 100%); color: #065f46; }
+        .alert-warning-custom { background: linear-gradient(135deg, var(--warning-light) 0%, #fde68a 100%); color: #92400e; }
+        .alert-error-custom   { background: linear-gradient(135deg, var(--error-light)   0%, #fecaca 100%); color: #991b1b; }
+        .alert-info-custom    { background: linear-gradient(135deg, var(--info-light)    0%, #bfdbfe 100%); color: #1e40af; }
+
+        /* ── BADGES ── */
+        .badge-custom { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.375rem 0.875rem; font-weight: 600; font-size: 0.8125rem; border-radius: var(--radius-full); white-space: nowrap; }
+        .badge-primary { background: linear-gradient(135deg, var(--primary-100), var(--primary-200)); color: var(--primary-800); }
+        .badge-success { background: linear-gradient(135deg, var(--success-light), #a7f3d0); color: #065f46; }
+        .badge-warning { background: linear-gradient(135deg, var(--warning-light), #fde68a); color: #92400e; }
+        .badge-error   { background: linear-gradient(135deg, var(--error-light),   #fecaca); color: #991b1b; }
+        .badge-info    { background: linear-gradient(135deg, var(--info-light),    #bfdbfe); color: #1e40af; }
+
+        /* ── TABLES ── */
+        .table-custom { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.9375rem; }
+        .table-custom thead { background: linear-gradient(135deg, var(--primary-50), var(--secondary-50)); }
+        .table-custom th { font-weight: 700; color: var(--text-primary); padding: 1rem 1.5rem; text-align: left; border-bottom: 2px solid var(--border-medium); }
+        .table-custom td { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-light); color: var(--text-secondary); }
+        .table-custom tbody tr { transition: all var(--transition-fast); }
+        .table-custom tbody tr:hover { background: var(--gray-50); }
+        .table-custom tbody tr:last-child td { border-bottom: none; }
+
+        /* ── LOADING / SKELETON ── */
+        .spinner-custom { width: 40px; height: 40px; border: 4px solid var(--border-light); border-top-color: var(--primary-500); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        .skeleton { background: linear-gradient(90deg, var(--gray-200) 25%, var(--gray-100) 50%, var(--gray-200) 75%); background-size: 1000px 100%; animation: shimmer 2s infinite; border-radius: var(--radius-md); }
+
+        /* ── TOAST NOTIFICATION ── */
+        .toast-stack {
+            position: fixed;
+            bottom: 1.75rem;
+            right: 1.75rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.625rem;
+            pointer-events: none;
+        }
+        .toast-item {
+            background: var(--gray-900);
+            color: white;
+            padding: 0.875rem 1.25rem;
+            border-radius: var(--radius-xl);
+            font-size: 0.9375rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            box-shadow: var(--shadow-2xl);
+            animation: toastIn 0.3s ease;
+            pointer-events: all;
+            max-width: 340px;
+        }
+        .toast-item.toast-success i { color: var(--success); }
+        .toast-item.toast-error   i { color: var(--error); }
+        .toast-item.toast-info    i { color: var(--accent-cyan); }
+
+        /* ── FOOTER ── */
+        .footer-custom {
+            background: linear-gradient(135deg, var(--gray-800) 0%, var(--gray-900) 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        .footer-link { color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.875rem; transition: color var(--transition-fast); }
+        .footer-link:hover { color: white; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 768px) {
+            .navbar-custom { padding: 0.625rem 0; }
+            .navbar-brand-custom { font-size: 1.1rem; }
+            .brand-icon { width: 36px; height: 36px; }
+            .brand-icon i { font-size: 1.1rem; }
+            .brand-sub { display: none; }
+            .main-container { padding: 1.5rem 0; }
+            .card-body-custom { padding: 1.25rem; }
+            .table-custom th, .table-custom td { padding: 0.75rem 1rem; }
+            .user-name-text { display: none; }
+            .toast-stack { bottom: 1rem; right: 1rem; left: 1rem; }
+            .toast-item { max-width: 100%; }
+        }
+
+        /* ── ACCESSIBILITY ── */
+        .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border-width:0; }
+        :focus-visible { outline: 2px solid var(--primary-500); outline-offset: 2px; }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <!-- ══════════════════════════════════════════
+         NAVIGATION BAR
+         ══════════════════════════════════════════ -->
+    <nav class="navbar navbar-expand-lg navbar-custom sticky-top" id="mainNavbar">
+        <div class="container">
+
+            <!-- Brand -->
+            <a class="navbar-brand-custom" href="{% url 'applications:create' %}">
+                <div class="brand-icon">
+                    <i class="fas fa-building"></i>
+                </div>
+                <div>
+                    <span>Заселение РГСУ</span>
+                    <span class="brand-sub">Информационная система</span>
+                </div>
+            </a>
+
+            <!-- Toggler (mobile) -->
+            <button class="navbar-toggler border-0 shadow-none" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Навигация">
+                <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+            </button>
+
+            <!-- Nav links -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center gap-1">
+                    {% if user.is_authenticated %}
+
+                        <!-- Role-specific nav links -->
+                        {% if user.role == 'student' %}
+                            <li class="nav-item">
+                                <a class="nav-link-custom {% if request.resolver_match.url_name == 'create' %}active{% endif %}"
+                                   href="{% url 'applications:create' %}">
+                                    <i class="fas fa-plus-circle"></i>
+                                    <span>Новая заявка</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link-custom {% if request.resolver_match.url_name == 'status' %}active{% endif %}"
+                                   href="{% url 'applications:status' %}">
+                                    <i class="fas fa-chart-line"></i>
+                                    <span>Моя заявка</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link-custom {% if request.resolver_match.url_name == 'upload' %}active{% endif %}"
+                                   href="{% url 'applications:upload' %}">
+                                    <i class="fas fa-upload"></i>
+                                    <span>Документы</span>
+                                </a>
+                            </li>
+
+                        {% elif user.role == 'admin' or user.is_staff %}
+                            <li class="nav-item">
+                                <a class="nav-link-custom {% if request.resolver_match.url_name == 'admin_application_list' %}active{% endif %}"
+                                   href="{% url 'applications:admin_application_list' %}">
+                                    <i class="fas fa-list-alt"></i>
+                                    <span>Все заявки</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link-custom {% if request.resolver_match.url_name == 'admin_rating_list' %}active{% endif %}"
+                                   href="{% url 'applications:admin_rating_list' %}">
+                                    <i class="fas fa-trophy"></i>
+                                    <span>Рейтинг</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link-custom" href="/admin/">
+                                    <i class="fas fa-cog"></i>
+                                    <span>Панель</span>
+                                </a>
+                            </li>
+
+                        {% elif user.role == 'commandant' %}
+                            <li class="nav-item">
+                                <a class="nav-link-custom" href="{% url 'applications:commandant_dashboard' %}">
+                                    <i class="fas fa-home"></i>
+                                    <span>Моё общежитие</span>
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        <!-- ─── USER DROPDOWN ─── -->
+                        <li class="nav-item user-menu-wrapper">
+                            <button type="button" class="user-toggle" id="userToggle"
+                                    aria-haspopup="true" aria-expanded="false">
+                                <div class="user-avatar">
+                                    {{ user.first_name|default:user.username|slice:":1"|upper }}
+                                </div>
+                                <span class="user-name-text">
+                                    {{ user.get_full_name|default:user.username }}
+                                </span>
+                                <i class="fas fa-chevron-down chevron-icon"></i>
+                            </button>
+
+                            <!-- Dropdown panel -->
+                            <div class="user-dropdown" id="userDropdown" role="menu">
+                                <div class="dropdown-header">
+                                    <div class="dropdown-header-name">
+                                        {{ user.get_full_name|default:user.username }}
+                                    </div>
+                                    <div class="dropdown-header-role">
+                                        {% if user.role == 'admin' or user.is_staff %}
+                                            Администратор
+                                        {% elif user.role == 'commandant' %}
+                                            Комендант
+                                        {% else %}
+                                            Студент · {{ user.email|default:"—" }}
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                {% if user.role == 'student' %}
+                                    <a href="{% url 'applications:status' %}" class="dropdown-item-custom" role="menuitem">
+                                        <i class="fas fa-chart-line"></i> Моя заявка
+                                    </a>
+                                    <a href="{% url 'applications:upload' %}" class="dropdown-item-custom" role="menuitem">
+                                        <i class="fas fa-folder-open"></i> Документы
+                                    </a>
+                                {% elif user.role == 'admin' or user.is_staff %}
+                                    <a href="/admin/" class="dropdown-item-custom" role="menuitem">
+                                        <i class="fas fa-cog"></i> Панель администратора
+                                    </a>
+                                {% endif %}
+
+                                <div class="dropdown-divider"></div>
+
+                                <!--
+                                    ════════════════════════════════════════════════
+                                    ИСПРАВЛЕНИЕ ОШИБКИ 405:
+                                    Django 5+ требует POST для /accounts/logout/.
+                                    Ссылка <a href="logout"> отправляет GET → 405.
+                                    Решение: скрытая форма + кнопка внутри неё.
+                                    ════════════════════════════════════════════════
+                                -->
+                                <form method="post" action="{% url 'logout' %}" id="logoutForm" class="logout-form">
+                                    {% csrf_token %}
+                                </form>
+                                <button type="button"
+                                        class="dropdown-item-custom dropdown-item-logout"
+                                        onclick="document.getElementById('logoutForm').submit()"
+                                        role="menuitem">
+                                    <i class="fas fa-sign-out-alt"></i> Выйти
+                                </button>
+
+                            </div>
+                        </li>
+                        <!-- ─── END USER DROPDOWN ─── -->
+
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link-custom" href="{% url 'login' %}">
+                                <i class="fas fa-sign-in-alt"></i>
+                                <span>Войти</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+
+        </div>
+    </nav>
+
+    <!-- ══════════════════════════════════════════
+         MAIN CONTENT
+         ══════════════════════════════════════════ -->
+    <main class="main-container">
+        <div class="container">
+
+            <!-- Django messages -->
+            {% if messages %}
+            <div class="mb-3">
+                {% for message in messages %}
+                <div class="alert-custom alert-{% if message.tags == 'success' %}success-custom{% elif message.tags == 'error' %}error-custom{% elif message.tags == 'warning' %}warning-custom{% else %}info-custom{% endif %} mb-3" role="alert">
+                    <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %}"></i>
+                    <div>{{ message }}</div>
+                    <button type="button" class="btn-close ms-auto" style="opacity:0.6;" onclick="this.closest('.alert-custom').remove()" aria-label="Закрыть"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- ══════════════════════════════════════════
+         FOOTER
+         ══════════════════════════════════════════ -->
+    <footer class="footer-custom">
+        <div class="container">
+            <div class="row align-items-center gy-2">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0" style="opacity:0.7; font-size:0.9rem;">
+                        <i class="fas fa-university me-2" style="color: var(--secondary-400);"></i>
+                        ФГБОУ ВО «Российский государственный социальный университет»
+                    </p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p class="mb-0" style="opacity:0.7; font-size:0.9rem;">
+                        <i class="fas fa-shield-alt me-1" style="color: var(--primary-400);"></i>
+                        Система заселения © 2025
+                        <span style="margin: 0 0.5rem; opacity:0.4;">·</span>
+                        <a href="{% url 'login' %}" class="footer-link">Войти</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast stack (populated by JS) -->
+    <div class="toast-stack" id="toastStack"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+    (function () {
+        'use strict';
+
+        /* ── Navbar scroll effect ── */
+        var navbar = document.getElementById('mainNavbar');
+        if (navbar) {
+            window.addEventListener('scroll', function () {
+                navbar.classList.toggle('scrolled', window.scrollY > 50);
+            }, { passive: true });
+        }
+
+        /* ── User dropdown toggle ── */
+        var userToggle   = document.getElementById('userToggle');
+        var userDropdown = document.getElementById('userDropdown');
+
+        if (userToggle && userDropdown) {
+            userToggle.addEventListener('click', function (e) {
+                e.stopPropagation();
+                var isOpen = userDropdown.classList.contains('open');
+                closeDropdown();
+                if (!isOpen) openDropdown();
+            });
+
+            /* Close when clicking outside */
+            document.addEventListener('click', function (e) {
+                if (!userToggle.contains(e.target) && !userDropdown.contains(e.target)) {
+                    closeDropdown();
+                }
+            });
+
+            /* Close on Escape */
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') closeDropdown();
+            });
+        }
+
+        function openDropdown() {
+            if (!userDropdown) return;
+            userDropdown.classList.add('open');
+            userToggle.classList.add('open');
+            userToggle.setAttribute('aria-expanded', 'true');
+        }
+        function closeDropdown() {
+            if (!userDropdown) return;
+            userDropdown.classList.remove('open');
+            userToggle && userToggle.classList.remove('open');
+            userToggle && userToggle.setAttribute('aria-expanded', 'false');
+        }
+
+        /* ── Auto-dismiss Django messages ── */
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.alert-custom').forEach(function (el) {
+                setTimeout(function () {
+                    el.style.transition = 'opacity 0.4s, transform 0.4s';
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateX(20px)';
+                    setTimeout(function () { el.remove(); }, 400);
+                }, 5000);
+            });
+        });
+
+        /* ── Smooth scroll for anchor links ── */
+        document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
+            anchor.addEventListener('click', function (e) {
+                var target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        /* ── Global toast helper (available to child templates) ── */
+        window.showToast = function (type, message) {
+            var icons = { success: 'check-circle', error: 'times-circle', info: 'info-circle', warning: 'exclamation-triangle' };
+            var stack = document.getElementById('toastStack');
+            var el    = document.createElement('div');
+            el.className = 'toast-item toast-' + type;
+            el.innerHTML = '<i class="fas fa-' + (icons[type] || 'info-circle') + '"></i> ' + message;
+            stack.appendChild(el);
+            setTimeout(function () {
+                el.style.transition = 'opacity 0.4s, transform 0.4s';
+                el.style.opacity    = '0';
+                el.style.transform  = 'translateY(12px)';
+                setTimeout(function () { el.remove(); }, 400);
+            }, 3500);
+        };
+
+    })();
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

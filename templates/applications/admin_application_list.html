@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Все заявки — Панель администратора{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ============================================
+       ADMIN APPLICATION LIST STYLES
+       ============================================ */
+    .admin-header { text-align: center; margin-bottom: 2.5rem; animation: fadeInDown 0.8s ease-out; }
+    .admin-title { font-size: 2.25rem; font-weight: 800; background: linear-gradient(135deg, var(--primary-600) 0%, var(--secondary-600) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.75rem; }
+    .admin-subtitle { font-size: 1.0625rem; color: var(--text-secondary); max-width: 700px; margin: 0 auto; line-height: 1.6; }
+
+    .controls-panel { background: white; border-radius: var(--radius-2xl); padding: 1.5rem; box-shadow: var(--shadow-lg); margin-bottom: 2rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between; animation: fadeInUp 0.8s ease-out 0.2s both; }
+    .controls-left { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; flex: 1; min-width: 300px; }
+    .controls-right { display: flex; gap: 0.75rem; align-items: center; }
+
+    .input-search { position: relative; flex: 1; min-width: 220px; }
+    .input-search input { width: 100%; padding: 0.75rem 1rem 0.75rem 2.75rem; border: 2px solid var(--border-light); border-radius: var(--radius-lg); font-size: 0.9375rem; transition: all var(--transition-fast); }
+    .input-search input:focus { border-color: var(--primary-500); box-shadow: 0 0 0 3px rgba(102,126,234,0.1); outline: none; }
+    .input-search i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-tertiary); pointer-events: none; }
+
+    .select-filter { padding: 0.75rem 1rem; border: 2px solid var(--border-light); border-radius: var(--radius-lg); font-size: 0.9375rem; background: white; cursor: pointer; min-width: 160px; }
+    .select-filter:focus { border-color: var(--primary-500); outline: none; }
+
+    .applications-table-wrap { background: white; border-radius: var(--radius-2xl); box-shadow: var(--shadow-xl); overflow: hidden; animation: scaleIn 0.6s ease-out; }
+    .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    
+    .applications-table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 900px; }
+    .applications-table thead { background: linear-gradient(135deg, var(--primary-50) 0%, var(--secondary-50) 100%); }
+    .applications-table th { padding: 1.25rem 1rem; text-align: left; font-weight: 700; color: var(--text-primary); font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.03em; border-bottom: 2px solid var(--border-medium); }
+    .applications-table td { padding: 1.25rem 1rem; border-bottom: 1px solid var(--border-light); vertical-align: middle; }
+    .applications-table tbody tr { transition: all var(--transition-fast); }
+    .applications-table tbody tr:hover { background: var(--gray-50); transform: scale(1.002); }
+    .applications-table tbody tr:last-child td { border-bottom: none; }
+
+    .app-id { font-weight: 700; color: var(--primary-700); font-size: 0.9375rem; }
+    
+    .student-cell { display: flex; align-items: center; gap: 0.875rem; min-width: 200px; }
+    .student-avatar-sm { width: 40px; height: 40px; border-radius: var(--radius-full); background: linear-gradient(135deg, var(--primary-100) 0%, var(--primary-200) 100%); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--primary-700); font-size: 0.875rem; flex-shrink: 0; }
+    .student-name { font-weight: 600; color: var(--text-primary); font-size: 0.9375rem; }
+    .student-meta-sm { font-size: 0.8125rem; color: var(--text-secondary); }
+
+    .rating-score { font-weight: 800; font-size: 1.125rem; color: var(--text-primary); }
+    
+    .status-badge-sm { padding: 0.375rem 0.75rem; border-radius: var(--radius-full); font-weight: 600; font-size: 0.8125rem; white-space: nowrap; }
+    .badge-draft { background: var(--gray-100); color: var(--gray-700); }
+    .badge-submitted { background: var(--info-light); color: #1e40af; }
+    .badge-under_review { background: var(--warning-light); color: #92400e; }
+    .badge-approved { background: var(--success-light); color: #065f46; }
+    .badge-assigned { background: linear-gradient(135deg, var(--primary-100), var(--secondary-100)); color: var(--primary-800); }
+    .badge-rejected { background: var(--error-light); color: #991b1b; }
+    .badge-checked_in { background: var(--secondary-100); color: #047857; }
+    .badge-checked_out { background: var(--gray-200); color: var(--gray-700); }
+
+    .btn-view-detail { padding: 0.5rem 0.875rem; border-radius: var(--radius-md); font-weight: 600; font-size: 0.8125rem; border: none; background: var(--primary-500); color: white; cursor: pointer; transition: all var(--transition-fast); display: inline-flex; align-items: center; gap: 0.375rem; text-decoration: none; }
+    .btn-view-detail:hover { background: var(--primary-700); transform: translateY(-1px); color: white; }
+
+    .empty-state { padding: 4rem 2rem; text-align: center; color: var(--text-tertiary); }
+    .empty-state i { font-size: 4rem; margin-bottom: 1rem; opacity: 0.4; }
+
+    .pagination-wrap { padding: 1.5rem; display: flex; justify-content: center; align-items: center; gap: 0.5rem; background: var(--gray-50); border-top: 1px solid var(--border-light); }
+    .page-link { padding: 0.5rem 0.875rem; border-radius: var(--radius-md); font-weight: 600; font-size: 0.875rem; color: var(--text-secondary); text-decoration: none; transition: all var(--transition-fast); border: 1px solid transparent; }
+    .page-link:hover { background: white; border-color: var(--border-medium); }
+    .page-link.active { background: var(--primary-500); color: white; }
+    .page-link.disabled { opacity: 0.5; pointer-events: none; }
+
+    @media (max-width: 768px) {
+        .controls-panel { flex-direction: column; align-items: stretch; }
+        .controls-left, .controls-right { width: 100%; justify-content: space-between; }
+        .select-filter { flex: 1; }
+        .applications-table thead { display: none; }
+        .applications-table, .applications-table tbody, .applications-table tr, .applications-table td { display: block; width: 100%; }
+        .applications-table tr { margin-bottom: 1rem; border: 2px solid var(--border-light); border-radius: var(--radius-xl); padding: 1rem; }
+        .applications-table td { text-align: right; padding: 0.75rem 0; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; }
+        .applications-table td::before { content: attr(data-label); font-weight: 700; color: var(--text-secondary); text-transform: uppercase; font-size: 0.75rem; text-align: left; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <h1 class="admin-title"><i class="fas fa-list-alt me-2"></i>Все заявки на заселение</h1>
+    <p class="admin-subtitle">Управление заявками студентов, верификация документов и распределение мест в общежитиях РГСУ</p>
+</div>
+
+<!-- Controls Panel -->
+<div class="controls-panel">
+    <div class="controls-left">
+        <div class="input-search">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Поиск по ФИО или username..." value="{{ search_query|default:'' }}">
+        </div>
+        <select class="select-filter" id="statusFilter" onchange="filterApplications()">
+            <option value="">Все статусы</option>
+            {% for value, label in statuses %}
+            <option value="{{ value }}" {% if current_status == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="controls-right">
+        <a href="{% url 'applications:admin_rating_list' %}" class="btn-custom btn-secondary-custom">
+            <i class="fas fa-trophy"></i> Рейтинговый список
+        </a>
+    </div>
+</div>
+
+<!-- Applications Table -->
+<div class="applications-table-wrap">
+    <div class="table-responsive">
+        <table class="applications-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Студент</th>
+                    <th>Факультет</th>
+                    <th>Рейтинг</th>
+                    <th>Очередь</th>
+                    <th>Статус</th>
+                    <th>Дата подачи</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for app in page_obj %}
+                <tr data-status="{{ app.status }}">
+                    <td data-label="ID"><span class="app-id">#{{ app.id }}</span></td>
+                    <td data-label="Студент">
+                        <div class="student-cell">
+                            <div class="student-avatar-sm">{{ app.student.first_name|default:app.student.username|slice:":1"|upper }}</div>
+                            <div>
+                                <div class="student-name">{{ app.student.get_full_name|default:app.student.username }}</div>
+                                <div class="student-meta-sm">{{ app.student.email|default:"—" }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td data-label="Факультет">{{ app.student.faculty|default:"—" }}</td>
+                    <td data-label="Рейтинг"><span class="rating-score">{{ app.rating_score|floatformat:2 }}</span></td>
+                    <td data-label="Очередь">{{ app.queue_position|default:"—" }}</td>
+                    <td data-label="Статус">
+                        <span class="status-badge-sm badge-{{ app.status }}">
+                            {{ app.get_status_display }}
+                        </span>
+                    </td>
+                    <td data-label="Дата">{{ app.created_at|date:"d.m.Y H:i" }}</td>
+                    <td data-label="Действия">
+                        <a href="{% url 'applications:admin_application_detail' app.id %}" class="btn-view-detail">
+                            <i class="fas fa-eye"></i> Подробнее
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h3>Заявки не найдены</h3>
+                        <p>По вашему запросу нет результатов. Попробуйте изменить параметры фильтрации.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="pagination-wrap">
+        {% if page_obj.has_previous %}
+            <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if current_status %}&status={{ current_status }}{% endif %}" class="page-link">« Первая</a>
+            <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if current_status %}&status={{ current_status }}{% endif %}" class="page-link">‹ Назад</a>
+        {% endif %}
+        
+        <span class="page-link active">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if current_status %}&status={{ current_status }}{% endif %}" class="page-link">Вперёд ›</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if current_status %}&status={{ current_status }}{% endif %}" class="page-link">Последняя »</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function filterApplications() {
+        const statusFilter = document.getElementById('statusFilter').value;
+        const searchInput = document.getElementById('searchInput').value;
+        
+        // Build URL with parameters
+        let url = '?';
+        const params = [];
+        
+        if (statusFilter) {
+            params.push('status=' + encodeURIComponent(statusFilter));
+        }
+        if (searchInput) {
+            params.push('search=' + encodeURIComponent(searchInput));
+        }
+        
+        if (params.length > 0) {
+            window.location.href = '?' + params.join('&');
+        } else {
+            window.location.href = '?';
+        }
+    }
+
+    // Auto-submit on search input (debounced)
+    let searchTimeout;
+    document.getElementById('searchInput').addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            filterApplications();
+        }, 500);
+    });
+
+    // Filter by status in real-time (client-side)
+    document.getElementById('statusFilter').addEventListener('change', function() {
+        const status = this.value;
+        const rows = document.querySelectorAll('.applications-table tbody tr[data-status]');
+        
+        rows.forEach(row => {
+            if (!status || row.dataset.status === status) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %}
